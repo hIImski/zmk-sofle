@@ -101,7 +101,7 @@
 &trans  &trans  &trans  &trans  &trans  &trans    &mmv MOVE_DOWN   &kp PG_UP  &kp END   &kp UP    &kp HOME   &kp UNDER  &kp PLUS
 &trans  &trans  &trans  &trans  &trans  &trans    &mmv MOVE_LEFT   &kp PG_DN  &kp LEFT  &kp DOWN  &kp RIGHT  &kp LBRC   &kp RBRC
 &trans  &trans  &trans  &trans  &trans  &trans    &mmv MOVE_RIGHT  &trans     &trans    &trans    &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK        &trans     &trans    &trans    &trans     &trans
+&tog 4  &trans  &trans  &trans  &trans  &trans    &mkp LCLK        &trans     &trans    &trans    &trans     &trans
             >;
 
             display-name = "layer2";
@@ -127,10 +127,10 @@
 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &kp LEFT_GUI  &trans  &kp LCTRL  &trans  &trans    &trans  &trans  &trans  &trans  &trans  &trans
             >;
 
-            display-name = "layer4";
+            display-name = "WIN";
             sensor-bindings = <&scroll_encoder>;
         };
     };

@@ -1,0 +1,78 @@
+[tools]
+python = "3.12"
+uv = "latest"
+cmake = "latest"
+ninja = "latest"
+"pipx:west" = "latest"
+"pipx:keymap-drawer" = "latest"
+
+[tasks.draw]
+description = "Regenerate keymap-drawer YAML and SVG for eyelash_sofle"
+run = [
+  "keymap -c keymap_drawer.config.yaml parse -z config/eyelash_sofle.keymap -o keymap-drawer/eyelash_sofle.yaml",
+  "keymap -c keymap_drawer.config.yaml draw keymap-drawer/eyelash_sofle.yaml -o keymap-drawer/eyelash_sofle.svg",
+]
+
+[tasks.west-init]
+description = "Create the local west workspace used for native ZMK builds"
+shell = "powershell -NoProfile -ExecutionPolicy Bypass -Command"
+run = '''
+$workspace = ".build/zmk"
+New-Item -ItemType Directory -Force $workspace | Out-Null
+if (-not (Test-Path "$workspace/.west")) {
+  west init -l config $workspace
+}
+'''
+
+[tasks.west-update]
+description = "Fetch ZMK and Zephyr dependencies into .build/zmk"
+depends = ["west-init"]
+dir = ".build/zmk"
+run = [
+  "west update --fetch-opt=--filter=tree:0",
+  "west zephyr-export",
+]
+
+[tasks.build-right]
+description = "Build right half firmware with nice_view"
+depends = ["west-update"]
+dir = ".build/zmk"
+shell = "powershell -NoProfile -ExecutionPolicy Bypass -Command"
+run = '''
+$repo = (Resolve-Path ../..).Path
+west build -s zmk/app -d "$repo/.build/firmware/right" -b eyelash_sofle_right -- -DZMK_CONFIG="$repo/config" -DZMK_EXTRA_MODULES="$repo" -DSHIELD=nice_view
+'''
+
+[tasks.build-left]
+description = "Build left half firmware with nice_view"
+depends = ["west-update"]
+dir = ".build/zmk"
+shell = "powershell -NoProfile -ExecutionPolicy Bypass -Command"
+run = '''
+$repo = (Resolve-Path ../..).Path
+west build -s zmk/app -d "$repo/.build/firmware/left" -b eyelash_sofle_left -- -DZMK_CONFIG="$repo/config" -DZMK_EXTRA_MODULES="$repo" -DSHIELD=nice_view
+'''
+
+[tasks.build-studio-left]
+description = "Build left half firmware with ZMK Studio enabled"
+depends = ["west-update"]
+dir = ".build/zmk"
+shell = "powershell -NoProfile -ExecutionPolicy Bypass -Command"
+run = '''
+$repo = (Resolve-Path ../..).Path
+west build -s zmk/app -d "$repo/.build/firmware/studio-left" -b eyelash_sofle_left -S studio-rpc-usb-uart -- -DZMK_CONFIG="$repo/config" -DZMK_EXTRA_MODULES="$repo" -DSHIELD=nice_view -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
+'''
+
+[tasks.build-reset]
+description = "Build settings reset firmware"
+depends = ["west-update"]
+dir = ".build/zmk"
+shell = "powershell -NoProfile -ExecutionPolicy Bypass -Command"
+run = '''
+$repo = (Resolve-Path ../..).Path
+west build -s zmk/app -d "$repo/.build/firmware/settings-reset" -b nice_nano_v2 -- -DZMK_CONFIG="$repo/config" -DZMK_EXTRA_MODULES="$repo" -DSHIELD=settings_reset
+'''
+
+[tasks.build-all]
+description = "Build all firmware targets from build.yaml"
+depends = ["build-right", "build-left", "build-studio-left", "build-reset"]
